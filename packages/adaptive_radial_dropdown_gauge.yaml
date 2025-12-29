@@ -1,0 +1,89 @@
+###############################################################################
+# Adaptive Radial Dropdown Gauge – Core Package
+#
+# Purpose:
+# - Controls dropdown state for an expandable radial chart / gauge
+# - Optional auto-close timer
+# - Optional hold (pin open)
+# - Optional auto-close on navigation (Browser Mod)
+###############################################################################
+
+########################################
+# HELPERS
+########################################
+input_boolean:
+  radial_gauge_expanded:
+    name: Radial Gauge Expanded
+
+  radial_gauge_hold:
+    name: Radial Gauge Hold (Pin Open)
+
+########################################
+# TIMER
+########################################
+timer:
+  radial_gauge_auto_close:
+    name: Radial Gauge Auto-Close
+    duration: "00:03:00"
+
+########################################
+# AUTOMATIONS
+########################################
+automation:
+  ########################################
+  # START / RESTART TIMER WHEN DROPDOWN OPENS
+  ########################################
+  - alias: "Radial Gauge – Start/Restart Auto-Close Timer"
+    id: radial_gauge_start_restart_timer
+    mode: restart
+    trigger:
+      - platform: state
+        entity_id: input_boolean.radial_gauge_expanded
+        to: "on"
+    condition:
+      - condition: state
+        entity_id: input_boolean.radial_gauge_hold
+        state: "off"
+    action:
+      - service: timer.start
+        target:
+          entity_id: timer.radial_gauge_auto_close
+
+  ########################################
+  # AUTO-CLOSE WHEN TIMER FINISHES
+  ########################################
+  - alias: "Radial Gauge – Auto-Close on Timer Finish"
+    id: radial_gauge_auto_close_on_timer
+    mode: single
+    trigger:
+      - platform: event
+        event_type: timer.finished
+        event_data:
+          entity_id: timer.radial_gauge_auto_close
+    condition:
+      - condition: state
+        entity_id: input_boolean.radial_gauge_hold
+        state: "off"
+    action:
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.radial_gauge_expanded
+
+  ########################################
+  # AUTO-CLOSE ON NAVIGATION (OPTIONAL)
+  ########################################
+  - alias: "Radial Gauge – Auto-Close on Navigation (browser_mod)"
+    id: radial_gauge_auto_close_on_navigation
+    mode: parallel
+    trigger:
+      - platform: event
+        event_type: browser_mod
+        event_data:
+          command: navigate
+    action:
+      - service: timer.cancel
+        target:
+          entity_id: timer.radial_gauge_auto_close
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.radial_gauge_expanded
