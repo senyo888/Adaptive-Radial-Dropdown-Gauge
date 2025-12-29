@@ -111,7 +111,11 @@ Colours
 Min / max values (if needed)
 The dropdown logic and UI behaviour stay exactly the same.
 
+
+COMPACT VIEW
 ![IMG_5344](https://github.com/user-attachments/assets/962bdb65-7e04-42ed-b6bb-0e6ca3783124)
 
+
+EXPANDED VIEW
 ![IMG_5345](https://github.com/user-attachments/assets/314ce9d2-691d-45f6-ab13-53eaa6274bf0)
 
